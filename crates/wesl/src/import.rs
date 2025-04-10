@@ -286,6 +286,7 @@ pub fn resolve_eager(resolutions: &mut Resolutions, resolver: &impl Resolver) ->
 
         // if the import path points to a local decl, we stop here
         if ext_path == module.path {
+            #[expect(clippy::map_entry, reason = "TODO, false positive?")]
             if module.idents.contains_key(&ty.ident) {
                 return Ok(());
             } else {

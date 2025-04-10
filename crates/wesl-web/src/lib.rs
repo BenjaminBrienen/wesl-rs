@@ -211,7 +211,7 @@ fn parse_binding(
             }
             _ => None,
         })
-        .ok_or_else(|| CliError::ResourceNotFound(b.group, b.binding))?;
+        .ok_or(CliError::ResourceNotFound(b.group, b.binding))?;
 
     let ty = ty_eval_ty(&ty_expr, &mut ctx).map_err(|e| {
         wesl::Diagnostic::from(e)
@@ -269,6 +269,10 @@ fn parse_override(src: &str, wgsl: &TranslationUnit) -> Result<Instance, CliErro
 }
 
 #[wasm_bindgen]
+#[cfg_attr(
+    not(feature = "debug"),
+    allow(unused_variables, reason = "must exist, but not needed")
+)]
 pub fn init_log(level: &str) {
     #[cfg(feature = "debug")]
     {
@@ -396,7 +400,7 @@ fn run_impl(args: Command) -> Result<RunResult, Error> {
                     .map(|r| {
                         let inst = exec
                             .resource(r.group, r.binding)
-                            .ok_or_else(|| CliError::ResourceNotFound(r.group, r.binding))?
+                            .ok_or(CliError::ResourceNotFound(r.group, r.binding))?
                             .clone();
                         let inst = inst.read().map_err(wesl::Error::from)?.to_owned();
                         let mut res = r.clone();
